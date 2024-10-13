@@ -75,7 +75,7 @@ public class RestaurantController {
 
         User user= userService.findUserByJwtToken(jwt);
 
-        RestaurantDto restaurant= restaurantService.addToFavourites(id,user);
+        RestaurantDto restaurant= restaurantService.addToFavorites(id,user);
 
         return new ResponseEntity<>(restaurant, HttpStatus.OK);
     }

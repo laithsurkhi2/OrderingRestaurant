@@ -47,7 +47,7 @@ public class Restaurant {
 
 
     @ElementCollection
-    @Column(length = 100)
+    @Column(length = 500)
     private List<String> images;
 
     private LocalDateTime registrationDate;

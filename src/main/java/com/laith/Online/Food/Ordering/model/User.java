@@ -45,7 +45,7 @@ public class User {
 
 
     @ElementCollection
-    private List<RestaurantDto> favourites= new ArrayList<>();
+    private List<RestaurantDto> favorites= new ArrayList<>();
 
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
