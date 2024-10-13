@@ -2,6 +2,7 @@ package com.laith.Online.Food.Ordering.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,7 +16,7 @@ import java.util.*;
 
 public class JwtProvider {
 
-    private SecretKey key = Keys.secretKeyFor(io.jsonwebtoken.SignatureAlgorithm.HS256);
+    private final SecretKey key = Keys.hmacShaKeyFor(JwtConstant.SECRET_KEY.getBytes());
 
     public String generateToken(Authentication auth) {
         Collection<? extends GrantedAuthority> authorities= auth.getAuthorities();
@@ -25,7 +26,7 @@ public class JwtProvider {
                 .setExpiration((new Date(new Date().getTime()+86400000)))
                 .claim("email", auth.getName())
                 .claim("authorities", roles)
-                .signWith(key)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
         System.out.println("Generated JWT: " + jwt);
@@ -34,7 +35,6 @@ public class JwtProvider {
     }
 
     public String getEmailFromJwtToken(String jwt){
-        jwt= jwt.substring(7);
         Claims claims= Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
@@ -42,8 +42,7 @@ public class JwtProvider {
                 .getBody();
 
 
-        String email= String.valueOf(claims.get("email"));
-        return email;
+        return String.valueOf(claims.get("email"));
     }
 
     private String populateAuthorities(Collection<? extends GrantedAuthority> authorities) {

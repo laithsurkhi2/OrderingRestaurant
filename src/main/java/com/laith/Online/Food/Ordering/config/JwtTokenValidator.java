@@ -1,6 +1,8 @@
 package com.laith.Online.Food.Ordering.config;
 
-import io.jsonwebtoken.Jwt;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,10 +19,6 @@ import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.util.List;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-
 
 public class JwtTokenValidator extends OncePerRequestFilter {
 
@@ -30,38 +28,24 @@ public class JwtTokenValidator extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        String jwt=request.getHeader(JwtConstant.JWT_HEADER);
+        String jwt = request.getHeader(JwtConstant.JWT_HEADER);
 
-        if(jwt!=null){
-            jwt= jwt.substring(7);
-
+        if (jwt != null) {
             try {
-                SecretKey key= Keys.hmacShaKeyFor(JwtConstant.SECRET_KEY.getBytes());
-                Claims claims= Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt).getBody();
+                SecretKey key = Keys.hmacShaKeyFor(JwtConstant.SECRET_KEY.getBytes());
+                Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt).getBody();
 
+                String email = String.valueOf(claims.get("email"));
+                String authorties = String.valueOf(claims.get("authorities"));
+                List<GrantedAuthority> auth = AuthorityUtils.commaSeparatedStringToAuthorityList(authorties);
 
-                String email= String.valueOf(claims.get("email"));
-                String authorties= String.valueOf(claims.get("authorities"));
-
-                //role_customer
-
-                //role_admin
-
-
-                List<GrantedAuthority> auth= AuthorityUtils.commaSeparatedStringToAuthorityList(authorties);
-
-                Authentication authentication= new UsernamePasswordAuthenticationToken(email,null,auth);
+                Authentication authentication = new UsernamePasswordAuthenticationToken(email, null, auth);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            }
-            catch(Exception e){
-                throw new BadCredentialsException("Invalid token...");
+            } catch (Exception e) {
+                throw new BadCredentialsException("Invalid token..." + e.getMessage());
             }
         }
-
         filterChain.doFilter(request, response);
-
-
-
     }
 }
