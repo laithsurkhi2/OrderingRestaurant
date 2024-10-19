@@ -6,11 +6,12 @@ import com.laith.Online.Food.Ordering.model.Restaurant;
 import com.laith.Online.Food.Ordering.repository.FoodRepository;
 import com.laith.Online.Food.Ordering.request.CreateFoodRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
+@Service
 public class FoodServiceImp implements FoodService {
 
 
@@ -54,7 +55,7 @@ public class FoodServiceImp implements FoodService {
                                          boolean isSeasonal,
                                          String foodCategory) {
 
-        List<Food> foods= foodRepository.findbyRestaurantId(restaurantid);
+        List<Food> foods= foodRepository.findByRestaurantId(restaurantid);
 
         if(isVegetarian){
             foods=filterByVegetarian(foods, isVegetarian);

@@ -1,9 +1,13 @@
 package com.laith.Online.Food.Ordering.controller;
 
 
+import com.laith.Online.Food.Ordering.model.Cart;
 import com.laith.Online.Food.Ordering.model.CartItem;
+import com.laith.Online.Food.Ordering.model.User;
 import com.laith.Online.Food.Ordering.request.AddCartItemRequest;
+import com.laith.Online.Food.Ordering.request.UpdateCartItemRequest;
 import com.laith.Online.Food.Ordering.service.CartService;
+import com.laith.Online.Food.Ordering.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +19,9 @@ public class CartController {
 
     @Autowired
     private CartService cartService;
+
+    @Autowired
+    private UserService userService;
 
 
     @PutMapping("/cart/add")
@@ -28,11 +35,44 @@ public class CartController {
 
     @PutMapping("/cart-item/update")
     public ResponseEntity<CartItem> updateCartItemQuantity(
-            @RequestBody AddCartItemRequest req,
+            @RequestBody UpdateCartItemRequest req,
                                                   @RequestHeader("Authorization")String jwt) throws Exception {
 
-        CartItem cartItem= cartService.addItemToCart(req, jwt);
+        CartItem cartItem= cartService.updateCartItemQuantity(req.getCartItemId(), req.getQuantity());
         return new ResponseEntity<>(cartItem, HttpStatus.OK);
+
+    }
+
+    @DeleteMapping("/cart-item/{id}/remove")
+    public ResponseEntity<Cart> removeCartItem(
+            @PathVariable Long id,
+            @RequestHeader("Authorization")String jwt) throws Exception {
+
+        Cart cart= cartService.removeItemFromCart(id,jwt);
+        return new ResponseEntity<>(cart, HttpStatus.OK);
+
+    }
+
+
+    @PutMapping("/cart/clear")
+    public ResponseEntity<Cart> clearCart(
+            @RequestHeader("Authorization")String jwt) throws Exception {
+
+        User user= userService.findUserByJwtToken(jwt);
+
+        Cart cart= cartService.clearCart(user.getId());
+        return new ResponseEntity<>(cart, HttpStatus.OK);
+
+    }
+
+    @GetMapping("/cart")
+    public ResponseEntity<Cart> findUserCart(
+            @RequestHeader("Authorization")String jwt) throws Exception {
+
+        User user= userService.findUserByJwtToken(jwt);
+
+        Cart cart= cartService.findCartByUserId(user.getId());
+        return new ResponseEntity<>(cart, HttpStatus.OK);
 
     }
 

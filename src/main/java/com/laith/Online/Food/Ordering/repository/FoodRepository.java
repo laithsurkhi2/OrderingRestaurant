@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface FoodRepository extends JpaRepository<Food, Long> {
 
-    List<Food> findbyRestaurantId(Long restaurantId);
+    List<Food> findByRestaurantId(Long restaurantId);
 
 
     @Query("SELECT f FROM Food f WHERE f.name LIKE %:keyword% OR f.foodCategory.name LIKE %:keyword% ")
