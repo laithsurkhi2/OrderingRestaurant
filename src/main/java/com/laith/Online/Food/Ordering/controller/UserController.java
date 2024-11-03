@@ -21,9 +21,15 @@ public class UserController {
 
     @GetMapping("/profile")
     public ResponseEntity<User> findUserByJwtToken(@RequestHeader("Authorization") String jwt) throws Exception {
+        // Strip the "Bearer " part from the token if it exists
+        if (jwt.startsWith("Bearer ")) {
+            jwt = jwt.substring(7);
+        }
 
-        User user= userService.findUserByJwtToken(jwt);
+        // Validate and process the token
+        User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(user, HttpStatus.OK);
-
     }
+
 }
+
